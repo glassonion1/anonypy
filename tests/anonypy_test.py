@@ -1,6 +1,5 @@
 import anonypy
 from anonypy import util
-from anonypy import mondrian
 import pandas as pd
 
 names = (
@@ -41,7 +40,7 @@ def test_build_anonymized_dataset():
         df[name] = df[name].astype('category')
 
     feature_columns = ['age', 'education-num']
-    m = mondrian.Mondrian(df, feature_columns)
+    m = anonypy.Mondrian(df, feature_columns)
     finished_partitions = m.partition(anonypy.is_k_anonymous)
 
     print(len(finished_partitions))
@@ -66,13 +65,13 @@ def test_get_spans():
         df[name] = df[name].astype('category')
 
     feature_columns = ['age', 'education-num']
-    m = mondrian.Mondrian(df, feature_columns)
+    m = anonypy.Mondrian(df, feature_columns)
     spans = m._get_spans(df.index)
 
     assert {'age': 73, 'education-num': 15} == spans
 
     feature_columns = ['sex', 'income', 'native-country', 'race']
-    m = mondrian.Mondrian(df, feature_columns)
+    m = anonypy.Mondrian(df, feature_columns)
     spans = m._get_spans(df.index)
 
     assert {'income': 2, 'sex': 2, 'native-country': 41, 'race': 5} == spans
