@@ -1,27 +1,4 @@
-import types
-
-def is_k_anonymous(partition, k):
-    if len(partition) < k:
-        return False
-    return True
-
-def is_l_diverse(sensitive_series, partition, l):
-    diversity = len(sensitive_series[partition].unique())
-    return diversity >= l
-
-def t_closeness(df, partition, column, global_freqs):
-    total_count = float(len(partition))
-    d_max = None
-    group_counts = df.loc[partition].groupby(column)[column].agg('count')
-    for value, count in group_counts.to_dict().items():
-        p = count/total_count
-        d = abs(p-global_freqs[value])
-        if d_max is None or d > d_max:
-            d_max = d
-    return d_max
-
-def is_t_close(df, partition, sensitive_column, global_freqs, p):
-    return t_closeness(df, partition, sensitive_column, global_freqs) <= p
+from anonypy import anonymity
 
 class Mondrian:
     def __init__(self, df, feature_columns, sensitive_column=None):
@@ -31,16 +8,16 @@ class Mondrian:
     
     def is_valid(self, partition, k=2, l=0, global_freqs=None, p=0.2):
         # k-anonymous
-        if not is_k_anonymous(partition, k):
+        if not anonymity.is_k_anonymous(partition, k):
             return False
         # l-diverse
         if l > 0 and self.sensitive_column is not None:
-            diverse = is_l_diverse(self.df[self.sensitive_column], partition, l)
+            diverse = anonymity.is_l_diverse(self.df, partition, self.sensitive_column, l)
             if not diverse:
                 return False
         # t-close
         if global_freqs is not None and self.sensitive_column is not None:
-            close = is_t_close(self.df, partition, self.sensitive_column, global_freqs, p)
+            close = anonymity.is_t_close(self.df, partition, self.sensitive_column, global_freqs, p)
             if not close:
                 return False
             
