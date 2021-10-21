@@ -1,47 +1,10 @@
-def is_k_anonymous(df, partition, k=3):
-    if len(partition) < k:
-        return False
-    return True
-
-def diversity(df, partition, column):
-    return len(df[column][partition].unique())
-
-def is_l_diverse(df, partition, sensitive_column, l=2):
-    """
-    :param               df: The dataframe for which to check l-diversity
-    :param        partition: The partition of the dataframe on which to check l-diversity
-    :param sensitive_column: The name of the sensitive column
-    :param                l: The minimum required diversity of sensitive attribute values in the partition
-    """
-    return diversity(df, partition, sensitive_column) >= l
-
-def t_closeness(df, partition, column, global_freqs):
-    total_count = float(len(partition))
-    d_max = None
-    group_counts = df.loc[partition].groupby(column)[column].agg('count')
-    for value, count in group_counts.to_dict().items():
-        p = count/total_count
-        d = abs(p-global_freqs[value])
-        if d_max is None or d > d_max:
-            d_max = d
-    return d_max
-
-def is_t_close(df, partition, sensitive_column, global_freqs, p=0.2):
-    """
-    :param               df: The dataframe for which to check l-diversity
-    :param        partition: The partition of the dataframe on which to check l-diversity
-    :param sensitive_column: The name of the sensitive column
-    :param     global_freqs: The global frequencies of the sensitive attribute values
-    :param                p: The maximum allowed Kolmogorov-Smirnov distance
-    """
-    return t_closeness(df, partition, sensitive_column, global_freqs) <= p
-
 def agg_categorical_column(series):
+    # this is workaround for dtype bug of series
+    series.astype('category')
     return [','.join(set(series))]
 
 def agg_numerical_column(series):
     return [series.mean()]
-
 
 def build_anonymized_dataset(df, partitions, feature_columns, sensitive_column, max_partitions=None):
     aggregations = {}

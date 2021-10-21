@@ -39,9 +39,11 @@ def test_build_anonymized_dataset():
     for name in categorical:
         df[name] = df[name].astype('category')
 
-    feature_columns = ['age', 'education-num']
-    m = anonypy.Mondrian(df, feature_columns)
-    finished_partitions = m.partition(anonypy.is_k_anonymous)
+    feature_columns = ['age', 'education']
+    sensitive_column = 'income'
+        
+    m = anonypy.Mondrian(df, feature_columns, sensitive_column)
+    finished_partitions = m.partition(k=3, l=2)
 
     print(len(finished_partitions))
     print(finished_partitions[0])
@@ -52,11 +54,34 @@ def test_build_anonymized_dataset():
 
     print(rects[:10])
 
-    sensitive_column = 'income'
     rows = anonypy.build_anonymized_dataset(df, finished_partitions, feature_columns, sensitive_column)
     dfn = pd.DataFrame(rows)
     print(dfn.sort_values(feature_columns+[sensitive_column]))
 
+def test_build_anonymized_dataset2():
+    path = 'data/adult.test.txt'
+    df = pd.read_csv(path, sep=', ', names=names, engine='python')
+
+    for name in categorical:
+        df[name] = df[name].astype('category')
+
+    feature_columns = ['age', 'education-num']
+    sensitive_column = 'income'
+
+    global_freqs = {}
+    total_count = float(len(df))
+    group_counts = df.groupby(sensitive_column)[sensitive_column].agg('count')
+    for value, count in group_counts.to_dict().items():
+        p = count/total_count
+        global_freqs[value] = p
+
+    m = anonypy.Mondrian(df, feature_columns, sensitive_column)
+    finished_partitions = m.partition(k=3, global_freqs=global_freqs)
+
+    rows = anonypy.build_anonymized_dataset(df, finished_partitions, feature_columns, sensitive_column)
+    dfn = pd.DataFrame(rows)
+    print(dfn.sort_values(feature_columns+[sensitive_column]))
+    
 def test_get_spans():
     path = 'data/adult.test.txt'
     df = pd.read_csv(path, sep=', ', names=names, engine='python')
@@ -66,13 +91,13 @@ def test_get_spans():
 
     feature_columns = ['age', 'education-num']
     m = anonypy.Mondrian(df, feature_columns)
-    spans = m._get_spans(df.index)
+    spans = m.get_spans(df.index)
 
     assert {'age': 73, 'education-num': 15} == spans
 
     feature_columns = ['sex', 'income', 'native-country', 'race']
     m = anonypy.Mondrian(df, feature_columns)
-    spans = m._get_spans(df.index)
+    spans = m.get_spans(df.index)
 
     assert {'income': 2, 'sex': 2, 'native-country': 41, 'race': 5} == spans
     
