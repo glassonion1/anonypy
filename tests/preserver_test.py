@@ -1,5 +1,4 @@
 import anonypy
-from anonypy import util
 import pandas as pd
 
 data = [
@@ -27,17 +26,12 @@ def test_k_anonymity():
 
     feature_columns = ["col1", "col2", "col3"]
     sensitive_column = "col4"
-    m = anonypy.Mondrian(df, feature_columns, sensitive_column)
-    partitions = m.partition(k=2)
-    print(f"partitions: {partitions}")
 
-    indexes = util.build_indexes(df)
-    column_x, column_y = feature_columns[:2]
-    rects = util.get_partition_rects(
-        df, partitions, column_x, column_y, indexes, offsets=[0.1, 0.1]
-    )
+    p = anonypy.Preserver(df, feature_columns, sensitive_column)
+    rows = p.anonymize_k_anonymity(k=2)
 
-    print(f"rect: {rects[:10]}")
+    dfn = pd.DataFrame(rows)
+    print(dfn)
 
 
 def test_l_diversity():
@@ -49,10 +43,11 @@ def test_l_diversity():
     feature_columns = ["col1", "col2", "col3"]
     sensitive_column = "col4"
 
-    m = anonypy.Mondrian(df, feature_columns, sensitive_column)
-    partitions = m.partition(k=2, l=2)
+    p = anonypy.Preserver(df, feature_columns, sensitive_column)
+    rows = p.anonymize_l_diversity(k=2, l=2)
 
-    print(f"partitions: {partitions}")
+    dfn = pd.DataFrame(rows)
+    print(dfn)
 
 
 def test_t_closeness():
@@ -64,21 +59,8 @@ def test_t_closeness():
     feature_columns = ["col1", "col2", "col3"]
     sensitive_column = "col4"
 
-    m = anonypy.Mondrian(df, feature_columns, sensitive_column)
-    partitions = m.partition(k=2, p=0.2)
+    p = anonypy.Preserver(df, feature_columns, sensitive_column)
+    rows = p.anonymize_t_closeness(k=2, p=0.2)
 
-    print(f"partitions: {partitions}")
-
-
-def test_get_spans():
-    df = pd.DataFrame(data=data, columns=columns)
-
-    for name in categorical:
-        df[name] = df[name].astype("category")
-
-    feature_columns = ["col1", "col2", "col3"]
-
-    m = anonypy.Mondrian(df, feature_columns)
-    spans = m.get_spans(df.index)
-
-    assert {"col1": 6, "col2": 2, "col3": 3} == spans
+    dfn = pd.DataFrame(rows)
+    print(dfn)

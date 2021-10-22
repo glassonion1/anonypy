@@ -7,7 +7,7 @@ class Mondrian:
         self.feature_columns = feature_columns
         self.sensitive_column = sensitive_column
 
-    def is_valid(self, partition, k=2, l=0, global_freqs=None, p=0.2):
+    def is_valid(self, partition, k=2, l=0, p=0.0):
         # k-anonymous
         if not anonymity.is_k_anonymous(partition, k):
             return False
@@ -19,7 +19,8 @@ class Mondrian:
             if not diverse:
                 return False
         # t-close
-        if global_freqs is not None and self.sensitive_column is not None:
+        if p > 0.0 and self.sensitive_column is not None:
+            global_freqs = anonymity.get_global_freq(self.df, self.sensitive_column)
             close = anonymity.is_t_close(
                 self.df, partition, self.sensitive_column, global_freqs, p
             )
@@ -55,7 +56,7 @@ class Mondrian:
             dfr = dfp.index[dfp >= median]
             return (dfl, dfr)
 
-    def partition(self, k=3, l=0, global_freqs=None, p=0.2):
+    def partition(self, k=3, l=0, p=0.0):
         scale = self.get_spans(self.df.index)
 
         finished_partitions = []
@@ -65,9 +66,7 @@ class Mondrian:
             spans = self.get_spans(partition, scale)
             for column, span in sorted(spans.items(), key=lambda x: -x[1]):
                 lp, rp = self.split(column, partition)
-                if not self.is_valid(lp, k, l, global_freqs, p) or not self.is_valid(
-                    rp, k, l, global_freqs, p
-                ):
+                if not self.is_valid(lp, k, l, p) or not self.is_valid(rp, k, l, p):
                     continue
                 partitions.extend((lp, rp))
                 break

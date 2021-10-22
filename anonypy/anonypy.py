@@ -1,3 +1,29 @@
+from anonypy import mondrian
+
+
+class Preserver:
+    def __init__(self, df, feature_columns, sensitive_column):
+        self.modrian = mondrian.Mondrian(df, feature_columns, sensitive_column)
+
+    def __anonymize(self, k, l=0, p=0.0):
+        partitions = self.modrian.partition(k, l, p)
+        return anonymize(
+            self.modrian.df,
+            partitions,
+            self.modrian.feature_columns,
+            self.modrian.sensitive_column,
+        )
+
+    def anonymize_k_anonymity(self, k):
+        return self.__anonymize(k)
+
+    def anonymize_l_diversity(self, k, l):
+        return self.__anonymize(k, l=l)
+
+    def anonymize_t_closeness(self, k, p):
+        return self.__anonymize(k, p=p)
+
+
 def agg_categorical_column(series):
     # this is workaround for dtype bug of series
     series.astype("category")
@@ -15,9 +41,7 @@ def agg_numerical_column(series):
     return [string]
 
 
-def build_anonymized_dataset(
-    df, partitions, feature_columns, sensitive_column, max_partitions=None
-):
+def anonymize(df, partitions, feature_columns, sensitive_column, max_partitions=None):
     aggregations = {}
     for column in feature_columns:
         if df[column].dtype.name == "category":
