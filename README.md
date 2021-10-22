@@ -20,6 +20,6 @@ def main():
 
     feature_columns = ['age', 'education-num']
     m = anonypy.Mondrian(df, feature_columns)
-    partitions = m.partition(anonypy.is_k_anonymous)
+    partitions = m.partition()
     print(partitions)
 ```
