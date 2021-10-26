@@ -1,5 +1,15 @@
 # AnonyPy
-Anonymization library for python
+Anonymization library for python.
+AnonyPy provides following privacy preserving techniques for the anonymization.
+- K Anonymity
+- L Diversity
+- T Closeness
+
+## The Anonymization method
+- Anonymization method aims at making the individual record be indistinguishable among a group record by using techniques of generalization and suppression.
+- Turning a dataset into a k-anonymous (and possibly l-diverse or t-close) dataset is a complex problem, and finding the optimal partition into k-anonymous groups is an NP-hard problem.
+- AnonyPy uses "Mondrian" algorithm to partition the original data into smaller and smaller groups
+- The algorithm assumes that we have converted all attributes into numerical or categorical values and that we are able to measure the “span” of a given attribute Xi.
 
 ## Install
 ```
