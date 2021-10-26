@@ -8,14 +8,15 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="anonypy",
-    version="0.1.1",
+    version="0.1.4",
     packages=find_packages(),
     author="glassonion1",
     author_email="glassonion999@gmail.com",
+    url="https://github.com/glassonion1/anonypy",
     description="Anonymization library for python",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    keywords="k-anonymity l-diversity t-closeness",
+    keywords="k-anonymity l-diversity t-closeness mondrian",
     classifiers=[
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

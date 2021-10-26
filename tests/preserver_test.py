@@ -34,6 +34,23 @@ def test_k_anonymity():
     print(dfn)
 
 
+def test_count_k_anonymity():
+    df = pd.DataFrame(data=data, columns=columns)
+    print(df)
+
+    for name in categorical:
+        df[name] = df[name].astype("category")
+
+    feature_columns = ["col1", "col2", "col3"]
+    sensitive_column = "col4"
+
+    p = anonypy.Preserver(df, feature_columns, sensitive_column)
+    rows = p.count_k_anonymity(k=2)
+
+    dfn = pd.DataFrame(rows)
+    print(dfn)
+
+
 def test_l_diversity():
     df = pd.DataFrame(data=data, columns=columns)
 
