@@ -1,2 +1,5 @@
-pytest==6.2.5
-pandas==1.1.0
+pytest>=6.2.5
+pandas>=1.1.0
+numpy>=1.21.3
+scikit-learn>=1.0.1
+category_encoders>=2.3.0
