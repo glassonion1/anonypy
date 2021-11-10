@@ -45,7 +45,9 @@ class Preserver:
 def agg_categorical_column(series):
     # this is workaround for dtype bug of series
     series.astype("category")
-    return [",".join(set(series))]
+
+    l = [str(n) for n in set(series)]
+    return [",".join(l)]
 
 
 def agg_numerical_column(series):

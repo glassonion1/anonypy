@@ -12,6 +12,9 @@ def test_attack():
     df = pd.read_csv("data/NHANES.csv", header=None, names=columns)
     print(f"\n{df.head()}")
 
+    df_attack = pd.read_csv("data/NHANES_attack.csv", header=None, names=columns)
+    print(f"\n{df_attack.head()}")
+
     for name in categorical:
         df[name] = df[name].astype("category")
 
@@ -25,7 +28,7 @@ def test_attack():
     dfn = pd.DataFrame(rows).loc[:, ["col1", "col2", "col3"]]
 
     # this is attackers knowledge
-    knowledge = df[40:50].loc[:, ["col1", "col2", "col3"]]
+    knowledge = df_attack.loc[:, ["col1", "col2", "col3"]]
 
     rl = attack.attack(dfn, knowledge)
     print(rl)

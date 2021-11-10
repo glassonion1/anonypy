@@ -8,7 +8,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="anonypy",
-    version="0.1.4",
+    version="0.1.7",
     packages=find_packages(),
     author="glassonion1",
     author_email="glassonion999@gmail.com",

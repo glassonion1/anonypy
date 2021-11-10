@@ -30,8 +30,6 @@ def attack(df, knowledge):
 
     di = pd.DataFrame(np.hstack((index, dist)))
 
-    print(di[2].median())
-
-    di.loc[di[2] > di[2].median(), :] = -1
+    di.loc[di[3] > di[3].median(), :] = -1
     # Display the top three
     return di.iloc[:, 0:k].astype(int)
