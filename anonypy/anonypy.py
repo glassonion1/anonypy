@@ -76,6 +76,7 @@ def anonymize(df, partitions, feature_columns, sensitive_column, max_partitions=
         sensitive_counts = (
             df.loc[partition].groupby(sensitive_column).agg({sensitive_column: "count"})
         )
+        grouped_columns = pd.DataFrame(grouped_columns.tolist(), index=grouped_columns.index).T
         values = grouped_columns.apply(lambda x: x[0]).to_dict()
         for sensitive_value, count in sensitive_counts[sensitive_column].items():
             if count == 0:
