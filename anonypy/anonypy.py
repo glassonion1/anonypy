@@ -1,4 +1,5 @@
 from anonypy import mondrian
+import pandas as pd
 
 
 class Preserver:
