@@ -1,10 +1,16 @@
 [project]
 name = "anonypy"
-version = "0.2.0"
+version = "0.2.1"
+authors = [{ name="glassonion1", email="glassonion999@gmail.com" }]
+requires-python = ">=3.10"
+readme = "README.md"
 description = "Anonymization library for python"
 keywords = ["k-anonymity","l-diversity","t-closeness","mondrian"]
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 [tool.setuptools]
 py-modules = []
+[project.urls]
+Homepage = "https://github.com/glassonion1/anonypy"
+"Bug Tracker" = "https://github.com/glassonion1/anonypy/issues"
