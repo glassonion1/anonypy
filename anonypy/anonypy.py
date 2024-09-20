@@ -78,27 +78,24 @@ def anonymize(df, partitions, feature_columns, sensitive_column, max_partitions=
             column: aggregations[column](df.loc[partition, column])
             for column in feature_columns
         }
-
         sensitive_counts = (
             df.loc[partition]
             .groupby(sensitive_column, observed=False)[sensitive_column]
             .count()
             .to_dict()
         )
-        grouped_columns = pd.DataFrame(
-            grouped_columns.tolist(), index=grouped_columns.index
-        ).T
-        values = grouped_columns.apply(lambda x: x[0]).to_dict()
+
         for sensitive_value, count in sensitive_counts.items():
             if count == 0:
                 continue
+            values = grouped_columns.copy()
             values.update(
                 {
                     sensitive_column: sensitive_value,
                     "count": count,
                 }
             )
-            rows.append(values.copy())
+            rows.append(values)
     return rows
 
 
