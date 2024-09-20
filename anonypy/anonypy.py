@@ -3,6 +3,7 @@ import pandas as pd
 
 
 class Preserver:
+
     def __init__(self, df, feature_columns, sensitive_column):
         self.modrian = mondrian.Mondrian(df, feature_columns, sensitive_column)
 
@@ -47,8 +48,8 @@ def agg_categorical_column(series):
     # this is workaround for dtype bug of series
     series.astype("category")
 
-    l = [str(n) for n in set(series)]
-    return [",".join(l)]
+    converted = [str(n) for n in set(series)]
+    return [",".join(converted)]
 
 
 def agg_numerical_column(series):
@@ -73,13 +74,22 @@ def anonymize(df, partitions, feature_columns, sensitive_column, max_partitions=
     for i, partition in enumerate(partitions):
         if max_partitions is not None and i > max_partitions:
             break
-        grouped_columns = df.loc[partition].agg(aggregations, squeeze=False)
+        grouped_columns = {
+            column: aggregations[column](df.loc[partition, column])
+            for column in feature_columns
+        }
+
         sensitive_counts = (
-            df.loc[partition].groupby(sensitive_column).agg({sensitive_column: "count"})
+            df.loc[partition]
+            .groupby(sensitive_column, observed=False)[sensitive_column]
+            .count()
+            .to_dict()
         )
-        grouped_columns = pd.DataFrame(grouped_columns.tolist(), index=grouped_columns.index).T
+        grouped_columns = pd.DataFrame(
+            grouped_columns.tolist(), index=grouped_columns.index
+        ).T
         values = grouped_columns.apply(lambda x: x[0]).to_dict()
-        for sensitive_value, count in sensitive_counts[sensitive_column].items():
+        for sensitive_value, count in sensitive_counts.items():
             if count == 0:
                 continue
             values.update(
@@ -107,6 +117,9 @@ def count_anonymity(
         if max_partitions is not None and i > max_partitions:
             break
         grouped_columns = df.loc[partition].agg(aggregations, squeeze=False)
-        values = grouped_columns.apply(lambda x: x[0]).to_dict()
+
+        values = grouped_columns.apply(
+            lambda x: x[0] if isinstance(x, list) else x
+        ).to_dict()
         rows.append(values.copy())
     return rows

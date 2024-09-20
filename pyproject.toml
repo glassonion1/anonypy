@@ -1,0 +1,10 @@
+[project]
+name = "anonypy"
+version = "0.2.0"
+description = "Anonymization library for python"
+keywords = ["k-anonymity","l-diversity","t-closeness","mondrian"]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+[tool.setuptools]
+py-modules = []
