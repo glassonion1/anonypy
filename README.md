@@ -79,6 +79,7 @@ The created anonymized data is below(Guarantee 2-anonymity).
 
 ## Publish PyPI
 ```
+$ python -m pip install hatchling wheel twine
 $ python -m build --wheel .
 $ python -m twine upload dist/*
 ```
