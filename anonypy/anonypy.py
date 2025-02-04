@@ -1,6 +1,10 @@
+import logging
+
 from anonypy import mondrian
 import pandas as pd
 
+logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 class Preserver:
 
@@ -64,39 +68,23 @@ def agg_numerical_column(series):
 
 
 def anonymize(df, partitions, feature_columns, sensitive_column, max_partitions=None):
+    # 1. deep copy dataframe
+    rv = df.copy()
+
     aggregations = {}
     for column in feature_columns:
-        if df[column].dtype.name == "category":
+        if df[column].dtype.name == 'category':
             aggregations[column] = agg_categorical_column
         else:
             aggregations[column] = agg_numerical_column
-    rows = []
-    for i, partition in enumerate(partitions):
-        if max_partitions is not None and i > max_partitions:
-            break
-        grouped_columns = {
-            column: aggregations[column](df.loc[partition, column])
-            for column in feature_columns
-        }
-        sensitive_counts = (
-            df.loc[partition]
-            .groupby(sensitive_column, observed=False)[sensitive_column]
-            .count()
-            .to_dict()
-        )
-
-        for sensitive_value, count in sensitive_counts.items():
-            if count == 0:
-                continue
-            values = grouped_columns.copy()
-            values.update(
-                {
-                    sensitive_column: sensitive_value,
-                    "count": count,
-                }
-            )
-            rows.append(values)
-    return rows
+        rv[column]=rv[column].astype('str')
+    
+    # 2. for each partition
+    for partition in partitions:
+        # 3. for each feature column:
+        for column in feature_columns:
+            rv.loc[partition, column] = aggregations[column](df.loc[partition, column])*len(partition)
+    return rv
 
 
 def count_anonymity(
